@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sestřel černyho</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 24px;
+      color: #000000;
+      background: #ffffff;
+      font: 16px Arial, sans-serif;
+      text-align: center;
+    }
+
+    main {
+      max-width: 600px;
+      margin: 32px auto;
+    }
+
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      margin: 20px;
+    }
+
+    .stats strong {
+      display: block;
+      margin-top: 5px;
+      font-size: 24px;
+    }
+
+    #start {
+      padding: 10px 20px;
+      border: 0;
+      color: rgb(0, 0, 0);
+      background: #9e9e9e;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #arena {
+      position: relative;
+      height: min(55vh, 360px);
+      min-height: 240px;
+      margin-top: 20px;
+      overflow: hidden;
+      background: rgb(130, 130, 130);
+      border: 1px solid #000000;
+    }
+
+    #target {
+      position: absolute;
+      width: 54px;
+      height: 54px;
+      padding: 0;
+      border: 4px solid #000000;
+      border-radius: 50%;
+      background: rgb(0, 0, 0);
+      box-shadow: inset 0 0 0 7px rgb(0, 0, 0), inset 0 0 0 11px rgb(0, 0, 0);
+      cursor: crosshair;
+      transform: translate(-50%, -50%);
+    }
+
+    #target:disabled {
+      display: none;
+    }
+
+    #message {
+      min-height: 1.2em;
+      color: #000000;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>TREF ČERNOCHA!</h1>
+    <p>POUŽIJ SVOJI MUSCLE MEMORY A SESTŘEL VŠECHNY ČERNÝ CÍLE</p>
+
+    <div class="stats" aria-live="polite">
+      <div>ČERNÝCH STŘELENO<strong id="score">0</strong></div>
+      <div>ČAS NEŽ ČERNOŠI UTEČOU<strong><span id="time">20</span> s</strong></div>
+    </div>
+
+    <button id="start" type="button">Začít hru</button>
+    <div id="arena" aria-label="Hrací plocha">
+      <button id="target" type="button" aria-label="Cíl" disabled></button>
+    </div>
+    <p id="message">ZAČNI HRU A SESTŘEL VŠECHNY ČERNÝ</p>
+  </main>
+
+  <script>
+    const startButton = document.querySelector("#start");
+    const target = document.querySelector("#target");
+    const arena = document.querySelector("#arena");
+    const scoreDisplay = document.querySelector("#score");
+    const timeDisplay = document.querySelector("#time");
+    const message = document.querySelector("#message");
+
+    let score = 0;
+    let time = 20;
+    let timer;
+    let playing = false;
+
+    function moveTarget() {
+      const margin = 30;
+      const x = margin + Math.random() * (arena.clientWidth - margin * 2);
+      const y = margin + Math.random() * (arena.clientHeight - margin * 2);
+      target.style.left = `${x}px`;
+      target.style.top = `${y}px`;
+    }
+
+    function endGame() {
+      clearInterval(timer);
+      target.disabled = true;
+      playing = false;
+      startButton.textContent = "STŘÍLEJ";
+      message.textContent = `KONEC NĚJACÍ ČERNOŠI UTEKLI ${score}×.`;
+    }
+
+    startButton.addEventListener("click", () => {
+      if (playing) return;
+
+      score = 0;
+      time = 20;
+      playing = true;
+      scoreDisplay.textContent = score;
+      timeDisplay.textContent = time;
+      target.disabled = false;
+      startButton.textContent = "STŘEL VŠECHNY";
+      message.textContent = "RYCHLE STŘILEJ JINAK VŠICHNI ČERNÝ UTEČOU!";
+      moveTarget();
+
+      clearInterval(timer);
+      timer = setInterval(() => {
+        timeDisplay.textContent = --time;
+        if (time === 0) endGame();
+      }, 1000);
+    });
+
+    target.addEventListener("click", () => {
+      if (!playing) return;
+      scoreDisplay.textContent = ++score;
+      moveTarget();
+    });
+
+  </script>
+</body>
+</html>
